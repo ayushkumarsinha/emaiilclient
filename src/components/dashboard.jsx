@@ -305,7 +305,11 @@ class Dashboard extends Component{
                 const delMess = restdelMessage && restdelMessage.length > 0 && restdelMessage.filter(m=>m.mId === message.mId);
                 restdelMessage.splice(delMess[0].mId,1);
                 this.setState({
-                    deletedMessages: restdelMessage
+                    deletedMessages: restdelMessage,
+                    mIdContent: '',
+                    messageDetail: '',
+                    fromSender: '',
+                    subject: ''
                 });
                 break;
             default: 
