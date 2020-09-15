@@ -17,6 +17,12 @@ class Deleted extends Component{
         this.forceUpdate();
     }
 
+    componentDidUpdate(prevProps){
+        if(prevProps.deletedMessages.length !== this.props.deletedMessages.length){
+            this.props.checkUnreadEmail();  
+        }
+    }
+
     render () {
         return(
             <div>
@@ -32,7 +38,7 @@ class Deleted extends Component{
                                     <div className={`w-95 m-l-5 fs-12 ${messages.unread ? 'colorBlue' : ''}`}>
                                         <div className='row m-l-0'>
                                             <div className='row col-md-11 m-l-0 p-l-0'>{messages.subject}</div>
-                                            <div className='row col-md-1 displayNone'><span onClick={()=>this.props.deleted(messages,'deleted')}><i className="fa fa-trash trashIcon"></i></span></div>
+                                            <div className='row col-md-1 displayNone'><span onClick={(e)=>{e.stopPropagation();this.props.deleted(messages,'deleted')}}><i className="fa fa-trash trashIcon"></i></span></div>
                                         </div>
                                     </div>
                                     <div className='w-95 m-l-5 fs-12'>

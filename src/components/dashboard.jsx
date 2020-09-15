@@ -27,7 +27,8 @@ class Dashboard extends Component{
             newInboxMessage: 0,
             newSpamMessage: 0,
             newJunkMessage: 0,
-            newDeletedMessage: 0
+            newDeletedMessage: 0,
+            callUpdate: false
         }
         this.reloadPage = this.reloadPage.bind(this);
         this.checkIsFolderSubMenuOpen = this.checkIsFolderSubMenuOpen.bind(this);
@@ -134,6 +135,14 @@ class Dashboard extends Component{
                 spamMessages: msg
             });
         }
+        if(this.state.deleted){
+            const msg = [...this.state.deletedMessages];
+            const tempMessage = msg.filter(m=>m.mId===readUnreadId);
+            tempMessage[0].unread = !tempMessage[0].unread;
+            this.setState({
+                deletedMessages: msg
+            });
+        }
         this.checkUnreadEmail();
         this.forceUpdate();
     }
@@ -163,6 +172,18 @@ class Dashboard extends Component{
                 subject: ''
             });
         } 
+        if(this.state.deleted){
+            const msg = [...this.state.deletedMessages];
+            const tempMessage = msg.filter(m=>m.mId===readUnreadId);
+            tempMessage[0].unread = false;
+            this.setState({
+                deletedMessages: msg,
+                mIdContent: '',
+                messageDetail: '',
+                fromSender: '',
+                subject: ''
+            });
+        }
         this.checkUnreadEmail();       
         this.forceUpdate();
     }
@@ -242,10 +263,9 @@ class Dashboard extends Component{
         }
 
         const unreadDeleted = this.state.deletedMessages && this.state.deletedMessages.filter(m=>m.unread);
-        if (unreadJunk){
+        if (unreadDeleted){
             for (let index = 0; index < unreadDeleted.length; index++) {
                 const element = unreadDeleted[index];
-                // element.unread=false;
                 const msg = [...this.state.deletedMessages];
                 const tempMessage = msg.filter(m=>m.mId===element.mId);
                 tempMessage[0].unread = false;
@@ -262,25 +282,22 @@ class Dashboard extends Component{
         this.checkUnreadEmail();
     }
 
-    deleted(message, mailBox){
+    deleted(message, mailBox){        
         switch(mailBox){
             case 'inbox':
                 const restInboxMessage = [...this.state.inboxMessages]
-                const inboxMess = restInboxMessage && restInboxMessage.length > 0 && restInboxMessage.filter(m=>m.mId === message.mId);
-                restInboxMessage.splice(inboxMess[0].mId,1);
+                const inboxMess = restInboxMessage && restInboxMessage.length > 0 && restInboxMessage.filter(m=>m.mId !== message.mId);
                 this.setState({
-                    inboxMessages: restInboxMessage,
-                    deletedMessages: [...this.state.deletedMessages, inboxMess]
-                });      
-                this.forceUpdate();
+                    inboxMessages: inboxMess,
+                    deletedMessages: [...this.state.deletedMessages, message]
+                });
                 break;
             case 'spam':
                 const restSpamMessage = [...this.state.spamMessages]
-                const spamMess = restSpamMessage && restSpamMessage.length > 0 && restSpamMessage.filter(m=>m.mId === message.mId);
-                spamMess.splice(spamMess[0].mId,1);
+                const spamMess = restSpamMessage && restSpamMessage.length > 0 && restSpamMessage.filter(m=>m.mId !== message.mId);
                 this.setState({
-                    spamMessages: restSpamMessage,
-                    deletedMessages: [...this.state.deletedMessages, spamMess]
+                    spamMessages: spamMess,
+                    deletedMessages: [...this.state.deletedMessages, message]
                 });
                 break;
             case 'deleted':
@@ -288,25 +305,14 @@ class Dashboard extends Component{
                 const delMess = restdelMessage && restdelMessage.length > 0 && restdelMessage.filter(m=>m.mId === message.mId);
                 restdelMessage.splice(delMess[0].mId,1);
                 this.setState({
-                    deletedMessages: restdelMessage//,
-                    // deletedMessages: [...this.state.deletedMessages]
+                    deletedMessages: restdelMessage
                 });
                 break;
             default: 
                 break;
         }
-        
-
-        
-        // const unreadJunk = this.state.junkMessages && this.state.junkMessages.filter(m=>m.unread).length;
-        // this.setState({
-        //     newJunkMessage: unreadJunk
-        // });
-
-        // const unreadDeleted = this.state.deletedMessages && this.state.deletedMessages.filter(m=>m.unread).length;
-        // this.setState({
-        //     newDeletedMessage: unreadDeleted
-        // });
+        this.checkUnreadEmail();              
+        this.forceUpdate();
     }
 
     componentDidMount(){
@@ -327,7 +333,6 @@ class Dashboard extends Component{
                     </div>
                     <div className='row col-1 col-md-1 dashboard-header-newMailNotification'>
                         <div className='messageIcon-boxing'>
-                            {/* <FontAwesomeIcon className='messageIcon' icon={faCommentDots}/> */}
                             <i className='messageIcon fa fa-comments'></i>
                         </div>
                     </div>
@@ -357,16 +362,13 @@ class Dashboard extends Component{
                                 </div>
                                 <div className='col-md-2'>
                                     <div className='row dashboard-header-header-item' onClick={() => this.markAllAsRead()}>
-                                            {/* <div className='row' onClick={() => this.markAllAsRead()}> */}
-                                                <div>
-                                                    <i className="fa fa-envelope-open searchIcon"></i>
-                                                </div>
-                                                <div className='p-l-5'>
-                                                    Mark all as read
-                                                </div>
-                                            {/* </div> */}
+                                        <div>
+                                            <i className="fa fa-envelope-open searchIcon"></i>
                                         </div>
-            
+                                        <div className='p-l-5'>
+                                            Mark all as read
+                                        </div>
+                                    </div>            
                                 </div>
                             </div>
                         </div>
@@ -409,7 +411,8 @@ class Dashboard extends Component{
                                     messageClick={(message)=>this.messageDetails(message)} 
                                     messageReadUnread={(readUnreadId)=>this.messageReadUnread(readUnreadId)}
                                     messageReadUnreadOnClick={(readUnreadId)=>this.messageReadUnreadOnClick(readUnreadId)}
-                                    deleted={(deletedItem, mailBox)=>this.deleted(deletedItem, mailBox)}/>}
+                                    deleted={(deletedItem, mailBox)=>this.deleted(deletedItem, mailBox)}
+                                    checkUnreadEmail={()=>this.checkUnreadEmail()}/>}
                             {this.state.junkEmail && <JunkEmail />}
                             {this.state.spam && 
                                 <Spam 
@@ -417,14 +420,16 @@ class Dashboard extends Component{
                                     messageClick={(message)=>this.messageDetails(message)} 
                                     messageReadUnread={(readUnreadId)=>this.messageReadUnread(readUnreadId)}
                                     messageReadUnreadOnClick={(readUnreadId)=>this.messageReadUnreadOnClick(readUnreadId)}
-                                    deleted={(deletedItem, mailBox)=>this.deleted(deletedItem, mailBox)}/>}
+                                    deleted={(deletedItem, mailBox)=>this.deleted(deletedItem, mailBox)}
+                                    checkUnreadEmail={()=>this.checkUnreadEmail()}/>}
                             {this.state.deleted && 
                                 <Deleted 
                                     deletedMessages={this.state.deletedMessages} 
                                     messageClick={(message)=>this.messageDetails(message)} 
                                     messageReadUnread={(readUnreadId)=>this.messageReadUnread(readUnreadId)}
                                     messageReadUnreadOnClick={(readUnreadId)=>this.messageReadUnreadOnClick(readUnreadId)}
-                                    deleted={(deletedItem, mailBox)=>this.deleted(deletedItem, mailBox)}/>}
+                                    deleted={(deletedItem, mailBox)=>this.deleted(deletedItem, mailBox)}
+                                    checkUnreadEmail={()=>this.checkUnreadEmail()}/>}
                         </div>
                         <div className='col-md-7 dashboard-body-content dashboard-body-menu-itemsRight-details'>
                             {this.state.mIdContent !== '' ? 
@@ -440,8 +445,6 @@ class Dashboard extends Component{
                                 </div>
                             </div>
                             : ''}
-                            <div></div>
-                            <div></div>
                         </div>
                    </div>
                 </div>
