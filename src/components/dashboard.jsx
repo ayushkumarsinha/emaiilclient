@@ -44,6 +44,7 @@ class Dashboard extends Component{
         window.location.reload(false);
     }
 
+    // logic to check for open and close folders tab on left pane
     checkIsFolderSubMenuOpen(){
         this.setState({
             isFolderSubMenuOpen: !this.state.isFolderSubMenuOpen,
@@ -58,6 +59,7 @@ class Dashboard extends Component{
         });
     }
 
+    // logic to set flag for click on inbox
     inboxHandler(){
         this.setState({
             inbox: true,
@@ -71,6 +73,7 @@ class Dashboard extends Component{
         });
     }
     
+    // logic to set flag for click on junk/Custom
     junkEmailHandler(){
         this.setState({
             inbox: false,
@@ -84,6 +87,7 @@ class Dashboard extends Component{
         });
     }
 
+    // logic to set flag for click on spam
     spamEmailHandler(){
         this.setState({
             inbox: false,
@@ -97,6 +101,7 @@ class Dashboard extends Component{
         });
     }
 
+    // logic to set flag for click on deleted
     deletedHandler(){
         this.setState({
             inbox: false,
@@ -110,6 +115,7 @@ class Dashboard extends Component{
         });
     }
 
+    // logic to set message details in the details view on right
     messageDetails(message){
         this.setState({
             isMessageDetailsClicked: true,
@@ -118,6 +124,8 @@ class Dashboard extends Component{
             subject: message.subject
         })
     }
+
+    // logic to set color for unread message by click on message item card
     messageReadUnread(readUnreadId){
         if(this.state.inbox){
             const msg = [...this.state.inboxMessages];
@@ -147,6 +155,7 @@ class Dashboard extends Component{
         this.forceUpdate();
     }
 
+    // logic to set color for unread message by click on blue/white bar for unread and read respectively
     messageReadUnreadOnClick(readUnreadId){
         if(this.state.inbox){
             const msg = [...this.state.inboxMessages];
@@ -188,6 +197,7 @@ class Dashboard extends Component{
         this.forceUpdate();
     }
 
+    // logic to check count of unread messages on left pane
     checkUnreadEmail(){
         const unreadInbox = this.state.inboxMessages && this.state.inboxMessages.filter(m=>m.unread).length;
         this.setState({
@@ -211,11 +221,11 @@ class Dashboard extends Component{
 
     }
 
+    // logic to mark all messages as read on click of 'Mark all as read' on header sub-menu
     markAllAsRead(){
         const unreadInbox = this.state.inboxMessages && this.state.inboxMessages.filter(m=>m.unread);
         for (let index = 0; index < unreadInbox.length; index++) {
             const element = unreadInbox[index];
-            // element.unread=false;
             const msg = [...this.state.inboxMessages];
             const tempMessage = msg.filter(m=>m.mId===element.mId);
             tempMessage[0].unread = false;
@@ -231,7 +241,6 @@ class Dashboard extends Component{
         const unreadSpam = this.state.spamMessages && this.state.spamMessages.filter(m=>m.unread);
         for (let index = 0; index < unreadSpam.length; index++) {
             const element = unreadSpam[index];
-            // element.unread=false;
             const msg = [...this.state.spamMessages];
             const tempMessage = msg.filter(m=>m.mId===element.mId);
             tempMessage[0].unread = false;
@@ -248,7 +257,6 @@ class Dashboard extends Component{
         if (unreadJunk){
             for (let index = 0; index < unreadJunk.length; index++) {
                 const element = unreadJunk[index];
-                // element.unread=false;
                 const msg = [...this.state.junkMessages];
                 const tempMessage = msg.filter(m=>m.mId===element.mId);
                 tempMessage[0].unread = false;
@@ -282,6 +290,8 @@ class Dashboard extends Component{
         this.checkUnreadEmail();
     }
 
+    //// logic to remove messages from inbox/spam folder to deleted and from deleted to completely remove 
+    //// on click of trash icon
     deleted(message, mailBox){        
         switch(mailBox){
             case 'inbox':
@@ -319,6 +329,7 @@ class Dashboard extends Component{
         this.forceUpdate();
     }
 
+    // logic to check for unread messages on mounting
     componentDidMount(){
         this.checkUnreadEmail();
     }

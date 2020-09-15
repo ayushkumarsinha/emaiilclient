@@ -1,6 +1,6 @@
 /* This is a common fole for complete styling used in the application */
 
-/* Styling for dashboard header starts here */
+/* Styling for application starts here */
 .dashboard-header{
     background-color: #282c34;
     min-height: 48px;
@@ -210,4 +210,4 @@
 .senderFrom{
     border-bottom: 1px solid #a8a9a8;
 }
-/* Styling for dashboard header ends here */
+/* Styling for application ends here */

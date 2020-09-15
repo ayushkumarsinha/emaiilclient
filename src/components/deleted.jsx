@@ -6,17 +6,21 @@ class Deleted extends Component{
         this.forceUpdateHandler = this.forceUpdateHandler.bind(this);
         this.updateOnClick = this.updateOnClick.bind(this);
     }
+
+    // logic to force update on read/unread colored band click
     forceUpdateHandler(messages){
         this.props.messageReadUnread(messages.mId);
         this.forceUpdate();
     };
 
+    // logic to force update on message card click
     updateOnClick(messages){
         this.props.messageReadUnreadOnClick(messages.mId);
         this.props.messageClick(messages);
         this.forceUpdate();
     }
 
+    // logic to update unread message count on change of number of messages
     componentDidUpdate(prevProps){
         if(prevProps.deletedMessages.length !== this.props.deletedMessages.length){
             this.props.checkUnreadEmail();  
